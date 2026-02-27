@@ -1,3 +1,6 @@
+
+<img width="1224" height="618" alt="CleanShot 2026-02-27 at 13 39 30@2x" src="https://github.com/user-attachments/assets/8607026a-854c-4884-9ec6-19705a1232c3" />
+
 # mcp-guard
 
 A simple HTTP proxy that gates MCP servers with block rules.
