@@ -17,18 +17,20 @@ Upstream MCP server (supabase, postgres, etc.)
 ### 1. Install
 
 ```bash
-npm install -g mcp-guard
+npm install -g @alramalho/mcp-guard
 ```
 
 Or from source:
 
 ```bash
-git clone <repo>
+git clone https://github.com/alramalho/mcp-guard
 cd mcp-guard
-pnpm install && pnpm build && npm link
+pnpm install && pnpm build && npm link --force
 ```
 
-### 2. Create `~/.mcp-guard.json`
+### 2. Create `.mcp-guard.json`
+
+In your project root (or `~/.mcp-guard.json` globally). Config is auto-discovered by walking up from cwd.
 
 ```json
 {
@@ -62,15 +64,23 @@ Replace the direct upstream URL with the mcp-guard proxy:
 
 ```bash
 $ mcp-guard
-MCP Guard turned on!
+MCP Guard on → http://localhost:6427
 
 $ mcp-guard
-MCP Guard turned off!
+MCP Guard off
+```
+
+### Debug mode
+
+Run in foreground to see all tool calls and block decisions live:
+
+```bash
+$ mcp-guard -d
 ```
 
 ## Config
 
-`~/.mcp-guard.json` (or pass `--config <path>`):
+`.mcp-guard.json` (auto-discovered from cwd up, or `~/.mcp-guard.json`, or `--config <path>`):
 
 | Field     | Type     | Default | Description                        |
 | --------- | -------- | ------- | ---------------------------------- |
@@ -82,6 +92,7 @@ Each server:
 | Field          | Type       | Description                                        |
 | -------------- | ---------- | -------------------------------------------------- |
 | `url`          | `string`   | Upstream MCP server URL                            |
+| `enabled`      | `boolean`  | Set to `false` to passthrough without blocking     |
 | `block`        | `string[]` | Patterns to block (case-insensitive substring match) |
 | `blockMessage` | `string`   | Error message returned when blocked                |
 
