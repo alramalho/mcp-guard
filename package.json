@@ -1,0 +1,31 @@
+{
+  "name": "@alramalho/mcp-guard",
+  "version": "0.2.0",
+  "description": "Simple HTTP proxy that gates MCP servers with block rules",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-guard": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "proxy",
+    "guard",
+    "gate",
+    "security"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
