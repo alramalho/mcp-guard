@@ -96,8 +96,26 @@ Each server:
 | -------------- | ---------- | -------------------------------------------------- |
 | `url`          | `string`   | Upstream MCP server URL                            |
 | `enabled`      | `boolean`  | Set to `false` to passthrough without blocking     |
+| `token`        | `string`   | Static Bearer token for upstream auth (optional)   |
 | `block`        | `string[]` | Patterns to block (case-insensitive substring match) |
 | `blockMessage` | `string`   | Error message returned when blocked                |
+
+## Authentication
+
+mcp-guard handles OAuth-protected upstream servers (e.g. Supabase) automatically. On first connection, if the upstream requires auth, mcp-guard will open your browser for OAuth authorization. Tokens are cached in `~/.mcp-guard/auth/` and refreshed automatically.
+
+Alternatively, you can provide a static token in the config:
+
+```json
+{
+  "servers": {
+    "my_server": {
+      "url": "https://example.com/mcp",
+      "token": "your-access-token"
+    }
+  }
+}
+```
 
 ## How It Works
 

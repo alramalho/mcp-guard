@@ -1,6 +1,7 @@
 export interface ServerConfig {
   url: string;
   enabled?: boolean;
+  token?: string;
   block?: string[];
   blockMessage?: string;
 }

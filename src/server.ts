@@ -5,8 +5,10 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
+import { UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
 import { GuardConfig, ServerConfig } from "./types.js";
 import { shouldBlock } from "./rules.js";
+import { McpGuardAuthProvider } from "./auth.js";
 
 const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
 const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
@@ -33,9 +35,36 @@ const sessions = new Map<string, Session>();
 const gates = new Map<string, GateState>();
 
 async function connectUpstream(name: string, config: ServerConfig): Promise<GateState> {
-  const transport = new StreamableHTTPClientTransport(new URL(config.url));
-  const client = new Client({ name: `mcp-guard-${name}`, version: "0.1.0" });
-  await client.connect(transport);
+  const authProvider = new McpGuardAuthProvider(name);
+
+  const headers: Record<string, string> = {};
+  if (config.token) {
+    headers["authorization"] = `Bearer ${config.token}`;
+  }
+
+  const transportOpts = {
+    authProvider,
+    ...(Object.keys(headers).length ? { requestInit: { headers } } : {}),
+  };
+
+  let transport = new StreamableHTTPClientTransport(new URL(config.url), transportOpts);
+  let client = new Client({ name: `mcp-guard-${name}`, version: "0.1.0" });
+
+  try {
+    await client.connect(transport);
+  } catch (err) {
+    if (err instanceof UnauthorizedError) {
+      log(`${yellow("waiting for browser auth")} ${cyan(name)}`);
+      const code = await authProvider.waitForAuthCode();
+      await transport.finishAuth(code);
+      // Create fresh transport+client since the old one is already started
+      transport = new StreamableHTTPClientTransport(new URL(config.url), transportOpts);
+      client = new Client({ name: `mcp-guard-${name}`, version: "0.1.0" });
+      await client.connect(transport);
+    } else {
+      throw err;
+    }
+  }
 
   const { tools } = await client.listTools();
   log(`${green("connected")} ${cyan(name)} ${dim(`(${tools.length} tools)`)}`);
@@ -108,7 +137,6 @@ async function handleRequest(
   const url = new URL(req.url ?? "/", `http://localhost:${config.port}`);
   const gateName = url.pathname.replace(/^\//, "").replace(/\/$/, "");
   log(`${dim(`${req.method} /${gateName}`)}`);
-
 
   if (!gateName) {
     res.writeHead(200, { "Content-Type": "application/json" });
