@@ -1,5 +1,5 @@
 
-<img width="1224" height="618" alt="CleanShot 2026-02-27 at 13 39 30@2x" src="https://github.com/user-attachments/assets/8607026a-854c-4884-9ec6-19705a1232c3" />
+<img width="1676" height="832" alt="CleanShot 2026-03-05 at 09 58 58@2x" src="https://github.com/user-attachments/assets/92ab5c40-2c16-4bc0-9432-364b20ff5412" />
 
 # mcp-guard
 
